@@ -4,10 +4,16 @@ require 'rails_helper'
 
 RSpec.describe FieldsController do
   describe 'GET index' do
-    it 'is successful' do
+    before do
       get :index
+    end
 
+    it 'is successful' do
       expect(response.status).to eq(200)
+    end
+
+    it 'returns valid json' do
+      expect(response.body).to include_json([{ humus_balance: nil }])
     end
   end
 
