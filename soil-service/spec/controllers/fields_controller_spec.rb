@@ -13,7 +13,7 @@ RSpec.describe FieldsController do
     end
 
     it 'returns valid json' do
-      expect(response.body).to include_json([{ humus_balance: nil }])
+      expect(response.body).to include_json([{ humus_balance: -3 }])
     end
   end
 

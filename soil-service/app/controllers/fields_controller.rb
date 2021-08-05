@@ -2,7 +2,7 @@
 
 class FieldsController < ApplicationController
   def index
-    render json: FieldsService.instance.fetch_fields
+    render json: FieldSerializer.fields_with_humus_balance
   end
 
   def humus_balance
