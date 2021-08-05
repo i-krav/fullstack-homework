@@ -12,10 +12,16 @@ RSpec.describe FieldsController do
   end
 
   describe 'GET humus_balance' do
-    it 'is successful' do
-      get :humus_balance
+    before do
+      get :humus_balance, params: { crop_ids: [1, 2, 3] }
+    end
 
+    it 'is successful' do
       expect(response.status).to eq(200)
+    end
+
+    it 'returns valid json' do
+      expect(response.body).to include_json({ humus_balance: -1 })
     end
   end
 end
