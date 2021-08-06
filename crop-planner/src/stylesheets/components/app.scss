@@ -1,3 +1,11 @@
 .app {
   padding: 16px;
+
+  .bg-green {
+    background-color: $green;
+  }
+
+  .bg-red {
+    background-color: $red;
+  }
 }
