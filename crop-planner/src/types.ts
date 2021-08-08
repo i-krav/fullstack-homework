@@ -11,4 +11,5 @@ export type Field = {
   area: number,
   crops: Array<SeasonalCrop>,
   humus_balance: number,
+  humus_balance_old: number | null,
 }

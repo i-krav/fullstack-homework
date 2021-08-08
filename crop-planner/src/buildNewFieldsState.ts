@@ -2,7 +2,7 @@ import { Crop, Field } from './types'
 import { filter, find } from 'lodash'
 
 // Here we emulate a reducer
-const buildNewFieldsState = (oldFields: Array<Field>, newCrop: Crop | null, fieldId: number, cropYear: number) => {
+const buildNewFieldsState = (oldFields: Array<Field>, newCrop: Crop | null, fieldId: number, cropYear: number, humusBalance: number, humusBalanceOld: number | null) => {
   const oldField = find(oldFields, field => field.id === fieldId)!
 
   return {
@@ -14,6 +14,8 @@ const buildNewFieldsState = (oldFields: Array<Field>, newCrop: Crop | null, fiel
           ...filter(oldField.crops, crop => crop.year !== cropYear),
           { year: cropYear, crop: newCrop },
         ],
+        humus_balance: humusBalance,
+        humus_balance_old: humusBalanceOld,
       },
     ],
   }

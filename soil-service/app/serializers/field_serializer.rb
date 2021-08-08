@@ -8,7 +8,7 @@ class FieldSerializer
 
   def fields_with_humus_balance
     all_fields.map do |field|
-      field.merge(humus_balance: get_humus_balance_for_field(field))
+      field.merge(humus_balance: get_humus_balance_for_field(field), humus_balance_old: nil)
     end
   end
 

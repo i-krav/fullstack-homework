@@ -12,7 +12,7 @@ module Fields
     def humus_balance
       crop_ids.each_with_index.sum do |id, index|
         consecutive?(index) ? CONS_COEF * humus_delta_by_id(id) : humus_delta_by_id(id)
-      end
+      end.round(2)
     end
 
     private

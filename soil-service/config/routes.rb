@@ -1,7 +1,7 @@
 Rails.application.routes.draw do
   resources :fields, only: [:index] do
     collection do
-      get 'humus_balance'
+      post 'humus_balance'
     end
   end
 

@@ -3,7 +3,7 @@ import { sortBy } from 'lodash'
 
 import CropSelect from './CropSelect'
 import { Crop, Field, SeasonalCrop } from './types'
-import { fetchCrops, fetchFields } from './api'
+import { fetchCrops, fetchFields, fetchHumusBalance } from './api'
 import buildNewFieldsState from './buildNewFieldsState'
 
 type Props = {}
@@ -45,27 +45,59 @@ export default class Table extends PureComponent<Props, State> {
       {sortBy(this.state.fields, field => field.name).map(field => this.renderFieldRow(field))}
     </div>
 
-  renderFieldRow = (field: Field) =>
-    <div className="table__row" key={field.id}>
-      <div className="table__cell">{field.name}</div>
-      <div className="table__cell table__cell--right">{field.area}</div>
+  renderFieldRow = (field: Field) => {
+    const statusClass = (() => {
+      if (field.humus_balance_old === null || field.humus_balance_old === field.humus_balance) {
+        return '';
+      } else if (field.humus_balance > field.humus_balance_old) {
+        return 'bg-green';
+      } else {
+        return 'bg-red';
+      };
+    })();
 
-      {sortBy(field.crops, crop => crop.year).map(seasonalCrop => this.renderCropCell(field, seasonalCrop))}
+    return (
+      <div className="table__row" key={field.id}>
+        <div className="table__cell">{field.name}</div>
+        <div className="table__cell table__cell--right">{field.area}</div>
 
-      <div className={`table__cell table__cell--right ${field.humus_balance > 0 ? "bg-green" : "bg-red" }`}>{field.humus_balance}</div>
-    </div>
+        {sortBy(field.crops, crop => crop.year).map(seasonalCrop => this.renderCropCell(field, seasonalCrop))}
+
+        <div className={`table__cell table__cell--right ${statusClass}`}>
+          {field.humus_balance}
+        </div>
+      </div>
+    );
+  }
 
   renderCropCell = (field: Field, seasonalCrop: SeasonalCrop) =>
-    <div className="table__cell table__cell--center table__cell--with-select">
+    <div className="table__cell table__cell--center table__cell--with-select" key={seasonalCrop.year}>
       <CropSelect
         selectedCrop={seasonalCrop.crop}
         allCrops={this.state.allCrops}
-        onChange={newCrop => this.changeFieldCrop(newCrop, field.id, seasonalCrop.year)}
+        onChange={newCrop => this.changeFieldCrop(newCrop, field.id, seasonalCrop.year, field.humus_balance)}
       />
     </div>
 
-  changeFieldCrop = (newCrop: Crop | null, fieldId: number, cropYear: number) =>
+  changeFieldCrop = async (newCrop: Crop | null, fieldId: number, cropYear: number, humusBalanceOld: number ) => {
+    const humusBalance = await this.getHumusBalance(fieldId, newCrop, cropYear);
     this.setState(
-      buildNewFieldsState(this.state.fields, newCrop, fieldId, cropYear),
+      buildNewFieldsState(this.state.fields, newCrop, fieldId, cropYear, humusBalance.humus_balance, humusBalanceOld),
     )
+  }
+
+  getHumusBalance = (fieldId: number, newCrop: Crop | null, cropYear: number ) => {
+    const field = this.state.fields.find( ({ id }) => id  === fieldId );
+    const crops = field!.crops;
+    const cropIndex = crops.findIndex((crop => crop.year == cropYear));
+    // Set newly selected crop
+    crops[cropIndex].crop = newCrop;
+
+    const cropIds = sortBy(crops, crop => crop.year)
+      .map(seasonCrop => seasonCrop!.crop!.value )
+      .filter(Number)
+
+    const humusBalanceResponse = fetchHumusBalance(cropIds);
+    return humusBalanceResponse;
+  }
 }
