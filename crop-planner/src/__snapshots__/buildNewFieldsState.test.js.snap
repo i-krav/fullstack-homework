@@ -94,6 +94,8 @@ Object {
           "year": 2022,
         },
       ],
+      "humus_balance": undefined,
+      "humus_balance_old": undefined,
       "id": 2,
       "name": "Orupealse",
     },
